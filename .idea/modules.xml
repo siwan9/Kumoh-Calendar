@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/kumoh_calendar.iml" filepath="$PROJECT_DIR$/kumoh_calendar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/kumoh_calendar_android.iml" filepath="$PROJECT_DIR$/android/kumoh_calendar_android.iml" />
+    </modules>
+  </component>
+</project>
