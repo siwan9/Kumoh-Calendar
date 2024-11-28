@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'calendar_page/page.dart';
 import "package:kumoh_calendar/meeting_page/meeting_schedule_page.dart";
 
 
@@ -40,6 +41,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     // TODO : 페이지 넣기
+    const CalendarPage(),
     const MeetingSchedulePage()
   ];
 
