@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kumoh_calendar/calendar_page/view_schedule_page/page.dart';
 import 'package:kumoh_calendar/data/schedule_data.dart';
 
 class ScheduleItemWidget extends StatelessWidget {
@@ -9,7 +10,15 @@ class ScheduleItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        // 항목 클릭 시 상세 페이지로 이동
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewSchedulePage(schedule: schedule),
+          ),
+        );
+      },
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all(Colors.blue),
         alignment: Alignment.centerLeft,
