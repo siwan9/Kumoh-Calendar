@@ -14,7 +14,8 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   void _signup() async {
     final String userEmail = _userEmailController.text.trim();
@@ -30,13 +31,15 @@ class _SignupPageState extends State<SignupPage> {
 
     try {
       // Firebase Auth를 통해 회원가입 시도
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: userEmail,
         password: password,
       );
 
       // Firestore에 데이터 저장
-      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
       await users.doc(userCredential.user!.uid).set({
         'email': userEmail,
       });
@@ -47,7 +50,6 @@ class _SignupPageState extends State<SignupPage> {
         MaterialPageRoute(builder: (context) => const SigninPage()),
         (Route<dynamic> route) => false,
       );
-
     } on FirebaseAuthException catch (e) {
       // 회원가입 실패 시 오류 처리
       ScaffoldMessenger.of(context).showSnackBar(
