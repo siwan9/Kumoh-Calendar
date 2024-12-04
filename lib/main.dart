@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'calendar_page/page.dart';
 import 'meeting_page/meeting_schedule/page/meeting_schedule_page.dart';
 import 'user_page/signin_page.dart';
+import './menu/ui/RestaurantTab.dart';
+import './menu/ui/NoticeUI.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +67,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const CalendarPage(),
+    RestaurantTab(),
+    NoticePage(),
     const MeetingSchedulePage(),
   ];
 
