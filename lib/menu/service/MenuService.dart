@@ -6,7 +6,7 @@ import 'package:kumoh_calendar/menu/entity/Menu.dart';
 import 'package:kumoh_calendar/menu/repository/MenuRepository.dart';
 
 class MenuService {
-  final MenuRepository repository = new MenuRepository();
+  final MenuRepository repository = MenuRepository();
 
   Future<List<Menu>> getMenus(String date) async {
     return await repository.findByDate(date);

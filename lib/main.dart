@@ -7,7 +7,7 @@ import 'calendar_page/page.dart';
 import 'meeting_page/meeting_schedule/page/meeting_schedule_page.dart';
 import 'user_page/signin_page.dart';
 import './menu/ui/RestaurantTab.dart';
-import './menu/ui/NoticeUI.dart';
+import 'notice_page/ui/NoticeUI.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,7 +93,8 @@ class _HomePageState extends State<HomePage> {
       body: _pages[_currentIndex], // 현재 선택된 페이지 표시
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: '일정'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today), label: '일정'),
           BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: '학식단'),
           BottomNavigationBarItem(icon: Icon(Icons.school), label: '학교공지'),
           BottomNavigationBarItem(icon: Icon(Icons.event_note), label: '그룹일정'),
