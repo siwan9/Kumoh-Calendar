@@ -7,7 +7,7 @@ import 'calendar_page/page.dart';
 import 'meeting_page/meeting_schedule/page/meeting_schedule_page.dart';
 import 'user_page/signin_page.dart';
 import './menu/ui/RestaurantTab.dart';
-import 'notice_page/NoticeUI.dart';
+import 'notice_page/ui/NoticeUI.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
