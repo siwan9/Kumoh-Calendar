@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:kumoh_calendar/calendar_page/date_item.dart';
+
+import '../data/schedule_data.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -13,6 +17,8 @@ class _CalendarPageState extends State<CalendarPage> {
   int _currentMonth = DateTime.now().month;
   String _title = "0월";
 
+  List<ScheduleData> _schedules = [];
+
   DateTime get _firstDateOfMonth {
     return DateTime(_currentYear, _currentMonth, 1);
   }
@@ -23,6 +29,23 @@ class _CalendarPageState extends State<CalendarPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _title = "$_currentMonth월";
+
+        // dummy data
+        _schedules = List.generate(10, (index) {
+          var startDate = DateTime(DateTime.now().year, DateTime.now().month,
+              Random().nextInt(27) + 1);
+          return ScheduleData(
+            id: index + 1,
+            name: '일정 ${index + 1}',
+            userId: 1, // 0에서 99 사이의 랜덤 사용자 ID
+            startDate: startDate,
+            endDate: startDate,
+            place: 'Place ${index + 1}',
+            memo: 'Memo for schedule ${index + 1}',
+            participants: List.generate(
+                Random().nextInt(5) + 1, (_) => Random().nextInt(100)),
+          );
+        });
       });
     });
   }
@@ -68,6 +91,13 @@ class _CalendarPageState extends State<CalendarPage> {
                 key: ValueKey(dateTime),
                 date: dateTime,
                 isCurrentMonth: dateTime.month == _currentMonth,
+                schedules: [
+                  for (var schedule in _schedules)
+                    if (schedule.startDate.day == dateTime.day &&
+                        schedule.startDate.month == dateTime.month &&
+                        schedule.startDate.year == dateTime.year)
+                      schedule
+                ],
               ));
             }));
 

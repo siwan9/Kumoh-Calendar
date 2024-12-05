@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:kumoh_calendar/data/schedule_data.dart';
 
-import 'schedule_item.dart';
+import 'date_schedule_item.dart';
 
 class DateItemWidget extends StatefulWidget {
   const DateItemWidget(
-      {super.key, required this.date, this.isCurrentMonth = true});
+      {super.key,
+      required this.date,
+      this.isCurrentMonth = true,
+      this.schedules = const []});
 
   final DateTime date;
   final bool isCurrentMonth;
+  final List<ScheduleData> schedules;
 
   @override
   State<DateItemWidget> createState() => _DateItemState();
@@ -28,11 +33,9 @@ class _DateItemState extends State<DateItemWidget> {
   Widget build(BuildContext context) {
     var alpha = widget.isCurrentMonth ? 255 : 128;
 
-    var schedules = <Widget>[
-      const ScheduleItemWidget(name: '일정 1'),
-      const SizedBox(height: 2),
-      const ScheduleItemWidget(name: '일정 2'),
-    ];
+    var schedules = widget.schedules
+        .map((e) => ScheduleItemWidget(schedule: e))
+        .toList(growable: false);
 
     return Container(
       padding: const EdgeInsets.all(2),
@@ -55,13 +58,11 @@ class _DateItemState extends State<DateItemWidget> {
                 style: TextStyle(
                     color: isToday
                         ? Color.fromARGB(alpha, 255, 255, 255)
-                        : (
-                          widget.date.weekday == 7 ?
-                          Color.fromARGB(alpha, 200, 0, 0) :
-                          widget.date.weekday == 6 ?
-                          Color.fromARGB(alpha, 0, 0, 200) :
-                          Color.fromARGB(alpha, 0, 0, 0))
-                        ),
+                        : (widget.date.weekday == 7
+                            ? Color.fromARGB(alpha, 200, 0, 0)
+                            : widget.date.weekday == 6
+                                ? Color.fromARGB(alpha, 0, 0, 200)
+                                : Color.fromARGB(alpha, 0, 0, 0))),
                 widget.date.day.toString()),
           ),
           const SizedBox(height: 4),
