@@ -51,16 +51,20 @@ class ScheduleRepository {
 
   // edit schedule
   Future<void> editSchedule(ScheduleData schedule) async {
-    var id = await _firestore
+    var target = await _firestore
         .collection('schedules')
         .where('id', isEqualTo: schedule.id)
         .get();
-    id.docs.first.reference.update(schedule.toJson());
+    target.docs.first.reference.update(schedule.toJson());
   }
 
   // delete schedule
   Future<void> deleteSchedule(int id) async {
-    await _firestore.collection('schedules').doc(id.toString()).delete();
+    var target = await _firestore
+        .collection('schedules')
+        .where('id', isEqualTo: id)
+        .get();
+    target.docs.first.reference.delete();
   }
 
   // stream onScheduleChanged only my schedule

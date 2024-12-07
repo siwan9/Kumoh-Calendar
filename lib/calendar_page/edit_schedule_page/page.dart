@@ -80,9 +80,12 @@ class _EditSchedulePageState extends State<EditSchedulePage> {
         toolbarHeight: 64,
         leadingWidth: 64,
         actions: [
-          TextButton(
+          IconButton(
             onPressed: onSubmit,
-            child: const Icon(Icons.save),
+            icon: const Icon(Icons.save),
+          ),
+          const SizedBox(
+            width: 8,
           ),
         ],
       ),
