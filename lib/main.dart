@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const InitialPage(), // 초기 페이지로 InitialPage 설정
+      debugShowCheckedModeBanner: false,
     );
   }
 }
