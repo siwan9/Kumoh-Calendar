@@ -40,7 +40,9 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         // set padding to 4px
         toolbarHeight: 64,
         leadingWidth: 64,

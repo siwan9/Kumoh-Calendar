@@ -76,7 +76,9 @@ class _EditSchedulePageState extends State<EditSchedulePage> {
     );
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         toolbarHeight: 64,
         leadingWidth: 64,
         actions: [

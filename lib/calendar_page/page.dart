@@ -104,6 +104,7 @@ class _CalendarPageState extends State<CalendarPage> {
             }));
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(_title),
         actions: [
@@ -116,10 +117,12 @@ class _CalendarPageState extends State<CalendarPage> {
             icon: const Icon(Icons.arrow_forward),
           ),
         ],
+        backgroundColor: Colors.white,
       ),
-      body: Column(children: [
+      body: Column(
+        children: [
         Row(
-          children: ['일', '월', '화', '수', '목', '금', '토']
+          children: const ['일', '월', '화', '수', '목', '금', '토']
               .map((day) => Expanded(
                     child: Center(
                       child: Text(
