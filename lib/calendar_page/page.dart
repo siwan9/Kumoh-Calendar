@@ -1,9 +1,10 @@
-import 'dart:math';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kumoh_calendar/calendar_page/date_item.dart';
+import 'package:kumoh_calendar/calendar_page/create_schedule_page/page.dart';
 
 import '../data/schedule_data.dart';
+import 'service/schedule_service.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -13,6 +14,9 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  User? user = FirebaseAuth.instance.currentUser;
+  final service = ScheduleService();
+
   int _currentYear = DateTime.now().year;
   int _currentMonth = DateTime.now().month;
   String _title = "0월";
@@ -29,23 +33,22 @@ class _CalendarPageState extends State<CalendarPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _title = "$_currentMonth월";
+      });
+      _refresh();
+    });
 
-        // dummy data
-        _schedules = List.generate(10, (index) {
-          var startDate = DateTime(DateTime.now().year, DateTime.now().month,
-              Random().nextInt(27) + 1);
-          return ScheduleData(
-            id: index + 1,
-            name: '일정 ${index + 1}',
-            userId: 1, // 0에서 99 사이의 랜덤 사용자 ID
-            startDate: startDate,
-            endDate: startDate,
-            place: 'Place ${index + 1}',
-            memo: 'Memo for schedule ${index + 1}',
-            participants: List.generate(
-                Random().nextInt(5) + 1, (_) => Random().nextInt(100)),
-          );
-        });
+    service.setUserId(user!.uid);
+
+    // TODO: 스케줄 추가 시 새로고침
+    service.onScheduleAdded.listen((event) {
+      _refresh();
+    });
+  }
+
+  void _refresh() {
+    service.getSchedules().then((value) {
+      setState(() {
+        _schedules = value;
       });
     });
   }
@@ -146,9 +149,20 @@ class _CalendarPageState extends State<CalendarPage> {
             ]))
       ]),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Colors.blue, // 버튼 배경색
-        child: const Icon(Icons.add), // 버튼 아이콘
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateSchedulePage(),
+            ),
+          );
+        },
+        backgroundColor: Colors.blue,
+        shape: const CircleBorder(),
+        child: const Icon(
+          color: Colors.white,
+          Icons.add,
+        ),
       ),
     );
   }
