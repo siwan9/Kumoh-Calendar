@@ -39,8 +39,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
     service.setUserId(user!.uid);
 
-    // TODO: 스케줄 추가 시 새로고침
-    service.onScheduleAdded.listen((event) {
+    service.onScheduleChanged.listen((event) {
       _refresh();
     });
   }

@@ -31,6 +31,19 @@ class ScheduleRepository {
         .toList();
   }
 
+  // get schedule by id
+  Future<ScheduleData> fetchScheduleById(int id) async {
+    final querySnapshot = await _firestore
+        .collection('schedules')
+        .where('userId', isEqualTo: userId)
+        .where('id', isEqualTo: id)
+        .get();
+
+    return querySnapshot.docs
+        .map((doc) => ScheduleData.fromJson(doc.data()))
+        .first;
+  }
+
   // add schedule
   Future<void> addSchedule(ScheduleData schedule) async {
     await _firestore.collection('schedules').add(schedule.toJson());
@@ -38,10 +51,11 @@ class ScheduleRepository {
 
   // edit schedule
   Future<void> editSchedule(ScheduleData schedule) async {
-    await _firestore
+    var id = await _firestore
         .collection('schedules')
-        .doc(schedule.id.toString())
-        .update(schedule.toJson());
+        .where('id', isEqualTo: schedule.id)
+        .get();
+    id.docs.first.reference.update(schedule.toJson());
   }
 
   // delete schedule
@@ -49,14 +63,11 @@ class ScheduleRepository {
     await _firestore.collection('schedules').doc(id.toString()).delete();
   }
 
-  // stream onScheduleAdded only my schedule
-  Stream<ScheduleData> get onScheduleAdded {
-    return _firestore
-        .collection('schedules')
-        .snapshots()
-        .map((snapshot) => snapshot.docs
+  // stream onScheduleChanged only my schedule
+  Stream<ScheduleData> get onScheduleChanged {
+    return _firestore.collection('schedules').snapshots().map((snapshot) =>
+        snapshot.docs
             .map((doc) => ScheduleData.fromJson(doc.data()))
             .firstWhere((schedule) => schedule.userId == userId));
   }
-
 }

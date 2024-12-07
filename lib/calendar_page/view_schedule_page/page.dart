@@ -1,12 +1,41 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kumoh_calendar/data/schedule_data.dart';
 
 import '../edit_schedule_page/page.dart';
+import '../service/schedule_service.dart';
 
-class ViewSchedulePage extends StatelessWidget {
+class ViewSchedulePage extends StatefulWidget {
   const ViewSchedulePage({super.key, required this.schedule});
 
   final ScheduleData schedule;
+
+  @override
+  State<ViewSchedulePage> createState() => _ViewSchedulePageState();
+}
+
+class _ViewSchedulePageState extends State<ViewSchedulePage> {
+  User? user = FirebaseAuth.instance.currentUser;
+  final service = ScheduleService();
+
+  late ScheduleData schedule;
+
+  @override
+  void initState() {
+    super.initState();
+    schedule = widget.schedule;
+    service.onScheduleChanged.listen((event) {
+      _refresh();
+    });
+  }
+
+  void _refresh() {
+    service.getScheduleById(schedule.id).then((value) {
+      setState(() {
+        schedule = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -12,6 +12,11 @@ class ScheduleService {
     return await _repository.fetchSchedules();
   }
 
+  //get schedule by id
+  Future<ScheduleData> getScheduleById(int id) async {
+    return await _repository.fetchScheduleById(id);
+  }
+
   Future<void> addSchedule(ScheduleData schedule) async {
     await _repository.addSchedule(schedule);
   }
@@ -24,6 +29,5 @@ class ScheduleService {
     await _repository.deleteSchedule(id);
   }
 
-  Stream<ScheduleData> get onScheduleAdded => _repository.onScheduleAdded;
-
+  Stream<ScheduleData> get onScheduleChanged => _repository.onScheduleChanged;
 }
