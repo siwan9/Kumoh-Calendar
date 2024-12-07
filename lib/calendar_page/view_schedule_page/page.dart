@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kumoh_calendar/data/schedule_data.dart';
 
+import '../edit_schedule_page/page.dart';
+
 class ViewSchedulePage extends StatelessWidget {
   const ViewSchedulePage({super.key, required this.schedule});
 
@@ -13,7 +15,22 @@ class ViewSchedulePage extends StatelessWidget {
         // set padding to 4px
         toolbarHeight: 64,
         leadingWidth: 64,
-
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // edit schedule
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return EditSchedulePage(schedule: schedule);
+                  },
+                ),
+              );
+            },
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -28,7 +45,7 @@ class ViewSchedulePage extends StatelessWidget {
               ),
               title: Text(
                 style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 schedule.name,
               ),
             ),

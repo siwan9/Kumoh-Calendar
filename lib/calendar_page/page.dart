@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kumoh_calendar/calendar_page/date_item.dart';
-import 'package:kumoh_calendar/calendar_page/create_schedule_page/page.dart';
+import 'package:kumoh_calendar/calendar_page/edit_schedule_page/page.dart';
 
 import '../data/schedule_data.dart';
 import 'service/schedule_service.dart';
@@ -153,7 +153,7 @@ class _CalendarPageState extends State<CalendarPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CreateSchedulePage(),
+              builder: (context) => const EditSchedulePage(schedule: null),
             ),
           );
         },
