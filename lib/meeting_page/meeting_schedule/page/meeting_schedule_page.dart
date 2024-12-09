@@ -5,10 +5,14 @@ import 'package:kumoh_calendar/meeting_page/add_meeting/page/add_metting_page.da
 import 'package:kumoh_calendar/meeting_page/meeting_availability/page/meeting_availability_page.dart';
 
 class MeetingSchedulePage extends StatefulWidget {
-  const MeetingSchedulePage({super.key});
+  const MeetingSchedulePage(
+      {super.key, required this.setTitle, required this.setMenu});
+
+  final Function(Widget) setTitle;
+  final Function(List<Widget>) setMenu;
 
   @override
-  _MeetingSchedulePageState createState() => _MeetingSchedulePageState();
+  State<MeetingSchedulePage> createState() => _MeetingSchedulePageState();
 }
 
 class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
@@ -19,6 +23,11 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
   void initState() {
     super.initState();
     _fetchMeetings();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.setTitle(const Text('그룹일정'));
+      widget.setMenu([]);
+    });
   }
 
   Future<void> _fetchMeetings() async {
@@ -57,7 +66,11 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
           );
         },
         backgroundColor: Colors.blue, // 버튼 배경색
-        child: const Icon(Icons.add), // 버튼 아이콘
+        shape: const CircleBorder(),
+        child: const Icon(
+          color: Colors.white,
+          Icons.add,
+        ),
       ),
     );
   }
@@ -78,7 +91,8 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const MeetingAvailabilityPage()),
+            MaterialPageRoute(
+                builder: (context) => const MeetingAvailabilityPage()),
           );
         },
         child: Card(
@@ -88,13 +102,17 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(meeting['name'] ?? '회의 이름', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(meeting['name'] ?? '회의 이름',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text('장소: ${meeting['location'] ?? '장소 미정'}'),
                 Text('인원: ${meeting['member_list'].length}명'),
                 const SizedBox(height: 8),
                 // 날짜 및 시간 형식은 필요한 대로 수정
-                Text('${meeting['start_date'].toDate()}~${meeting['finish_date'].toDate()}', style: const TextStyle(color: Colors.grey)),
+                Text(
+                    '${meeting['start_date'].toDate()}~${meeting['finish_date'].toDate()}',
+                    style: const TextStyle(color: Colors.grey)),
               ],
             ),
           ),

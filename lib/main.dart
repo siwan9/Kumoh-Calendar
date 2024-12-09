@@ -65,23 +65,44 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  Widget _title = const Text('Kumoh-Calendar');
+  List<Widget> _actions = [];
 
-  final List<Widget> _pages = [
-    const CalendarPage(),
-    RestaurantTab(),
-    NoticePage(),
-    const MeetingSchedulePage(),
-  ];
+  void setTitle(Widget title) {
+    setState(() {
+      _title = title;
+    });
+  }
+
+  void setActions(List<Widget> actions) {
+    setState(() {
+      _actions = actions;
+    });
+  }
+
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      CalendarPage(setTitle: setTitle, setMenu: setActions),
+      RestaurantTab(setTitle: setTitle, setMenu: setActions),
+      NoticePage(setTitle: setTitle, setMenu: setActions),
+      MeetingSchedulePage(setTitle: setTitle, setMenu: setActions),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kumoh-Calendar'),
+        title: _title,
         backgroundColor: Colors.white,
         actions: [
+          ..._actions,
           IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black), // 옵션 아이콘
+            icon: const Icon(Icons.account_circle, color: Colors.black, size: 32,), // 옵션 아이콘
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -89,6 +110,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ), // 옵션 페이지로 이동
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: _pages[_currentIndex], // 현재 선택된 페이지 표시

@@ -1,15 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:kumoh_calendar/firebase_options.dart';
 import 'package:kumoh_calendar/notice_page/entity/GeneralNotice.dart';
 import 'package:kumoh_calendar/notice_page/entity/Notice.dart';
 import 'package:kumoh_calendar/notice_page/service/NoticeService.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NoticePage extends StatefulWidget {
+  const NoticePage({super.key, required this.setTitle, required this.setMenu});
+
+  final Function(Widget) setTitle;
+  final Function(List<Widget>) setMenu;
+
   @override
-  _NoticePageState createState() => _NoticePageState();
+  State<NoticePage> createState() => _NoticePageState();
 }
 
 class _NoticePageState extends State<NoticePage> {
@@ -25,6 +27,11 @@ class _NoticePageState extends State<NoticePage> {
     super.initState();
     fetchNotices();
     fetchGeneralNotices();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.setTitle(const Text('공지사항'));
+      widget.setMenu([]);
+    });
   }
 
   // Notices 데이터를 불러오는 메서드
@@ -48,11 +55,7 @@ class _NoticePageState extends State<NoticePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("공지사항"),
-        backgroundColor: Colors.lightBlue[100],
-        centerTitle: true,
-      ),
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           _buildTypeSelector(),
