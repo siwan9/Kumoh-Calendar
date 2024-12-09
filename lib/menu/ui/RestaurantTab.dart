@@ -3,27 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kumoh_calendar/menu/service/MenuService.dart';
 import 'package:kumoh_calendar/menu/entity/Menu.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:kumoh_calendar/firebase_options.dart';
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  runApp(MaterialApp(
-    theme: ThemeData(
-      primarySwatch: Colors.blue,
-      fontFamily: 'Roboto',
-    ),
-    home: RestaurantTab(),
-  ));
-}
 
 class RestaurantTab extends StatefulWidget {
+  const RestaurantTab(
+      {super.key, required this.setTitle, required this.setMenu});
+
+  final Function(Widget) setTitle;
+  final Function(List<Widget>) setMenu;
+
   @override
-  _RestaurantTabState createState() => _RestaurantTabState();
+  State<RestaurantTab> createState() => _RestaurantTabState();
 }
 
 class _RestaurantTabState extends State<RestaurantTab> {
@@ -38,40 +27,30 @@ class _RestaurantTabState extends State<RestaurantTab> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.setTitle(Text(formatDate(selectedDate)));
+      widget.setMenu([
+        IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _previousDay,
+        ),
+        IconButton(
+          icon: const Icon(Icons.arrow_forward),
+          onPressed: _nextDay,
+        ),
+      ]);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlue[100],
-        title: Text('식단',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: _previousDay,
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward),
-            onPressed: _nextDay,
-          ),
-        ],
-      ),
       body: Container(
         color: Colors.white,
         child: Column(
           children: [
-            // 날짜 표시
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                formatDate(selectedDate),
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-              ),
-            ),
-
             // 상단 버튼: 식당/기숙사/분식당 선택
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -79,9 +58,9 @@ class _RestaurantTabState extends State<RestaurantTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildCategoryButton('식당'),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   _buildCategoryButton('기숙사'),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   _buildCategoryButton('분식당'),
                 ],
               ),
@@ -93,11 +72,11 @@ class _RestaurantTabState extends State<RestaurantTab> {
                 future: _getMenusForDay(selectedDate),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('오류가 발생했습니다: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('데이터가 없습니다.'));
+                    return const Center(child: Text('데이터가 없습니다.'));
                   } else {
                     // 데이터 필터링 및 렌더링
                     final groupedData = _groupMenusByRestaurant(snapshot.data!);
@@ -124,12 +103,12 @@ class _RestaurantTabState extends State<RestaurantTab> {
           selectedCategory = category;
         });
       },
-      child: Text(category, style: TextStyle(fontSize: 16)),
       style: ElevatedButton.styleFrom(
         foregroundColor:
             selectedCategory == category ? Colors.blue : Colors.grey[300],
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       ),
+      child: Text(category, style: const TextStyle(fontSize: 16)),
     );
   }
 
@@ -232,7 +211,7 @@ class _RestaurantTabState extends State<RestaurantTab> {
   Widget _buildSnackList(Map<String, Map<String, List<String>>> data) {
     final snackMenu = data["분식당"]?["일품요리"] ?? [];
     if (snackMenu.isEmpty) {
-      return Center(
+      return const Center(
           child: Text('분식당 메뉴가 없습니다.', style: TextStyle(fontSize: 16)));
     }
 
@@ -246,7 +225,7 @@ class _RestaurantTabState extends State<RestaurantTab> {
   Widget _buildRestaurantCard(
       String restaurantName, Map<String, List<String>> meals) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -255,7 +234,8 @@ class _RestaurantTabState extends State<RestaurantTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(restaurantName,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ..._buildMealRows(meals),
           ],
         ),
@@ -273,10 +253,11 @@ class _RestaurantTabState extends State<RestaurantTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(mealTime,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              ...menuList
-                  .map((menu) => Text(menu, style: TextStyle(fontSize: 16))),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              ...menuList.map(
+                  (menu) => Text(menu, style: const TextStyle(fontSize: 16))),
             ],
           ),
         ));
@@ -288,18 +269,20 @@ class _RestaurantTabState extends State<RestaurantTab> {
   void _previousDay() {
     setState(() {
       selectedDate = DateTime.parse(selectedDate)
-          .subtract(Duration(days: 1))
+          .subtract(const Duration(days: 1))
           .toString()
           .split(' ')[0];
+      widget.setTitle(Text(formatDate(selectedDate)));
     });
   }
 
   void _nextDay() {
     setState(() {
       selectedDate = DateTime.parse(selectedDate)
-          .add(Duration(days: 1))
+          .add(const Duration(days: 1))
           .toString()
           .split(' ')[0];
+      widget.setTitle(Text(formatDate(selectedDate)));
     });
   }
 }

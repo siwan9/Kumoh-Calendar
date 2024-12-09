@@ -7,7 +7,11 @@ import '../data/schedule_data.dart';
 import 'service/schedule_service.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+  const CalendarPage(
+      {super.key, required this.setTitle, required this.setMenu});
+
+  final Function(Widget) setTitle;
+  final Function(List<Widget>) setMenu;
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
@@ -19,7 +23,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
   int _currentYear = DateTime.now().year;
   int _currentMonth = DateTime.now().month;
-  String _title = "0월";
 
   List<ScheduleData> _schedules = [];
 
@@ -31,9 +34,17 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _title = "$_currentMonth월";
-      });
+      widget.setTitle(Text("$_currentMonth월"));
+      widget.setMenu([
+        IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _prevMonth,
+        ),
+        IconButton(
+          icon: const Icon(Icons.arrow_forward),
+          onPressed: _nextMonth,
+        ),
+      ]);
       _refresh();
     });
 
@@ -60,7 +71,7 @@ class _CalendarPageState extends State<CalendarPage> {
       } else {
         _currentMonth++;
       }
-      _title = "$_currentMonth월";
+      widget.setTitle(Text("$_currentMonth월"));
     });
   }
 
@@ -72,7 +83,7 @@ class _CalendarPageState extends State<CalendarPage> {
       } else {
         _currentMonth--;
       }
-      _title = "$_currentMonth월";
+      widget.setTitle(Text("$_currentMonth월"));
     });
   }
 
@@ -105,22 +116,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(_title),
-        actions: [
-          IconButton(
-            onPressed: _prevMonth,
-            icon: const Icon(Icons.arrow_back),
-          ),
-          IconButton(
-            onPressed: _nextMonth,
-            icon: const Icon(Icons.arrow_forward),
-          ),
-        ],
-        backgroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
+      body: Column(children: [
         Row(
           children: const ['일', '월', '화', '수', '목', '금', '토']
               .map((day) => Expanded(
