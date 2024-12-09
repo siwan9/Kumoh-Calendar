@@ -472,14 +472,15 @@ class _MeetingAvailabilityPageState extends State<MeetingAvailabilityPage> {
                     },
                     child: Text(isEditMode ? '취소하기' : '수정하기'), // 버튼 텍스트 변경
                   ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isFinalSchedule = !isFinalSchedule; // 최종 일정 토글
-                    });
-                  },
-                  child: Text(isFinalSchedule ? '취소하기' : '최종 일정 선택하기'),
-                ),
+                if (!isEditMode && isMasterMember) 
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isFinalSchedule = !isFinalSchedule; // 최종 일정 토글
+                      });
+                    },
+                    child: Text(isFinalSchedule ? '취소하기' : '최종 일정 선택하기'),
+                  ),
                 if (isEditMode) // 수정 모드일 때만 저장하기 버튼 표시
                   ElevatedButton(
                     onPressed: _saveMeeting,
