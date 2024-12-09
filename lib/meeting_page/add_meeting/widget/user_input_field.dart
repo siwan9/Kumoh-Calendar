@@ -47,6 +47,7 @@ class UserInputField extends StatelessWidget {
                 return ListTile(
                   title: Text(user),
                   onTap: () {
+                    controller.text = user;
                     onSelectUser(user); // 입력 필드에 사용자 이름 추가
                   },
                 );

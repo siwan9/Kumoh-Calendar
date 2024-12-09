@@ -4,7 +4,7 @@ class DateTimeRow extends StatelessWidget {
   final String title;
   final DateTime dateTime;
   final IconData icon;
-  final bool isStartDate;
+  final bool isStartDate; // 시작/종료 날짜 구분 변수
   final ValueChanged<DateTime> onDateTimeChanged;
 
   const DateTimeRow({
@@ -21,67 +21,21 @@ class DateTimeRow extends StatelessWidget {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
-      subtitle: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '${dateTime.year}년 ${dateTime.month}월 ${dateTime.day}일 (${_getDayOfWeek(dateTime.weekday)})',
-          ),
-          Text(
-            _formatTime(dateTime),
-            style: const TextStyle(color: Colors.black),
-          ),
-        ],
+      subtitle: Text(
+        '${dateTime.year}년 ${dateTime.month}월 ${dateTime.day}일 (${_getDayOfWeek(dateTime.weekday)})',
       ),
       trailing: const Icon(Icons.arrow_forward_ios),
       onTap: () async {
-        DateTime? pickedDateTime = await showDatePicker(
+        DateTime? pickedDate = await showDatePicker(
           context: context,
           initialDate: dateTime,
           firstDate: DateTime.now(),
           lastDate: DateTime(2100),
         );
 
-        if (pickedDateTime != null) {
-          TimeOfDay? pickedTime = await _showCustomTimePicker(context, TimeOfDay.fromDateTime(dateTime));
-
-          if (pickedTime != null) {
-            onDateTimeChanged(DateTime(
-              pickedDateTime.year,
-              pickedDateTime.month,
-              pickedDateTime.day,
-              pickedTime.hour,
-              pickedTime.minute,
-            ));
-          }
+        if (pickedDate != null) {
+          onDateTimeChanged(pickedDate);
         }
-      },
-    );
-  }
-
-  Future<TimeOfDay?> _showCustomTimePicker(BuildContext context, TimeOfDay initialTime) async {
-    int selectedHour = initialTime.hour;
-
-    return showDialog<TimeOfDay>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('시간 선택'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(24, (index) {
-                return ListTile(
-                  title: Text('${index}시'),
-                  onTap: () {
-                    Navigator.of(context).pop(TimeOfDay(hour: index, minute: 0));
-                  },
-                  selected: index == selectedHour,
-                );
-              }),
-            ),
-          ),
-        );
       },
     );
   }
@@ -97,12 +51,5 @@ class DateTimeRow extends StatelessWidget {
       case 7: return '일';
       default: return '';
     }
-  }
-
-  String _formatTime(DateTime dateTime) {
-    String period = dateTime.hour >= 12 ? '오후' : '오전';
-    int hour = dateTime.hour % 12;
-    String minute = dateTime.minute < 10 ? '0${dateTime.minute}' : '${dateTime.minute}';
-    return '$period $hour:$minute';
   }
 }
