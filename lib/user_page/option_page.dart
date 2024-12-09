@@ -44,9 +44,10 @@ class OptionsPage extends StatelessWidget {
 
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const SigninPage()),
+      (Route<dynamic> route) => false,
     );
   }
 }

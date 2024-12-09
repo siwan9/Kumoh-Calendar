@@ -52,7 +52,7 @@ class _SigninPageState extends State<SigninPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('로그인'),
+        title: const Text('Kumoh Calendar'),
         backgroundColor: Colors.white,
       ),
       body: Padding(
