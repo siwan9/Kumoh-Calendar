@@ -1,4 +1,6 @@
 // 중복 코드는 생략
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kumoh_calendar/menu/service/MenuService.dart';
@@ -51,21 +53,6 @@ class _RestaurantTabState extends State<RestaurantTab> {
         color: Colors.white,
         child: Column(
           children: [
-            // 상단 버튼: 식당/기숙사/분식당 선택
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildCategoryButton('식당'),
-                  const SizedBox(width: 16),
-                  _buildCategoryButton('기숙사'),
-                  const SizedBox(width: 16),
-                  _buildCategoryButton('분식당'),
-                ],
-              ),
-            ),
-
             // 데이터 표시
             Expanded(
               child: FutureBuilder<List<Menu>>(
@@ -80,11 +67,15 @@ class _RestaurantTabState extends State<RestaurantTab> {
                   } else {
                     // 데이터 필터링 및 렌더링
                     final groupedData = _groupMenusByRestaurant(snapshot.data!);
-                    final filteredData = _filterDataByCategory(groupedData);
 
-                    return selectedCategory == '분식당'
-                        ? _buildSnackList(filteredData)
-                        : _buildRestaurantList(filteredData);
+                    return ListView(
+                      children: [
+                        _buildRestaurantList("조식", groupedData),
+                        _buildRestaurantList("중식", groupedData),
+                        _buildRestaurantList("석식", groupedData),
+                        _buildRestaurantList("일품요리", groupedData),
+                      ],
+                    );
                   }
                 },
               ),
@@ -92,23 +83,6 @@ class _RestaurantTabState extends State<RestaurantTab> {
           ],
         ),
       ),
-    );
-  }
-
-  // 버튼 생성 함수
-  Widget _buildCategoryButton(String category) {
-    return ElevatedButton(
-      onPressed: () {
-        setState(() {
-          selectedCategory = category;
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        foregroundColor:
-            selectedCategory == category ? Colors.blue : Colors.grey[300],
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      ),
-      child: Text(category, style: const TextStyle(fontSize: 16)),
     );
   }
 
@@ -166,6 +140,29 @@ class _RestaurantTabState extends State<RestaurantTab> {
     }
   }
 
+  // 시간대별 필터링
+  Map<String, List<String>> _filterDataByMealTime(
+      Map<String, Map<String, List<String>>> groupedData, String mealTime) {
+    Map<String, List<String>> result = {};
+
+    for (var entry in groupedData.entries) {
+      String restaurantName = entry.key;
+      if (((restaurantName == "분식당") == (mealTime != "일품요리")) ||
+          restaurantName != "학생식당" && mealTime == "조식" ||
+          restaurantName == "학생식당" && mealTime == "석식") {
+        continue;
+      }
+      if (entry.value.containsKey(mealTime) &&
+          entry.value[mealTime]!.isNotEmpty) {
+        result.putIfAbsent(restaurantName, () => entry.value[mealTime]!);
+      } else {
+        result.putIfAbsent(restaurantName, () => ["식당 운영 없음"]);
+      }
+    }
+
+    return result;
+  }
+
   String _translateRestaurant(String englishName) {
     switch (englishName) {
       case "STUDENT":
@@ -200,70 +197,91 @@ class _RestaurantTabState extends State<RestaurantTab> {
     }
   }
 
-  Widget _buildRestaurantList(Map<String, Map<String, List<String>>> data) {
-    return ListView(
-      children: data.entries.map((entry) {
-        return _buildRestaurantCard(entry.key, entry.value);
-      }).toList(),
-    );
-  }
+  Widget _buildRestaurantList(
+      String mealTime, Map<String, Map<String, List<String>>> data) {
+    final filteredData = _filterDataByMealTime(data, mealTime);
+    print(filteredData.toString());
 
-  Widget _buildSnackList(Map<String, Map<String, List<String>>> data) {
-    final snackMenu = data["분식당"]?["일품요리"] ?? [];
-    if (snackMenu.isEmpty) {
-      return const Center(
-          child: Text('분식당 메뉴가 없습니다.', style: TextStyle(fontSize: 16)));
-    }
+    var maxMealCount = max(
+        filteredData.values
+            .map((value) => value.length)
+            .reduce((value, element) => value > element ? value : element),
+        2);
+        print(maxMealCount);
 
-    return ListView(
-      children: [
-        _buildRestaurantCard("분식당", {"일품요리": snackMenu}),
-      ],
-    );
+    return SizedBox(
+        height: 50 + 55 + 22 * maxMealCount.toDouble(),
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 11),
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(51, 0, 128, 255),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  child: Text(mealTime,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w500)),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                SizedBox(
+                    height: 55 + 22 * maxMealCount.toDouble(),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: filteredData.entries.map((entry) {
+                        return _buildRestaurantCard(entry.key, entry.value,
+                            filteredData.entries.length == 1);
+                      }).toList(),
+                    ))
+              ],
+            )));
   }
 
   Widget _buildRestaurantCard(
-      String restaurantName, Map<String, List<String>> meals) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(restaurantName,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            ..._buildMealRows(meals),
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildMealRows(Map<String, List<String>> meals) {
-    List<Widget> mealWidgets = [];
-    meals.forEach((mealTime, menuList) {
-      if (menuList.isNotEmpty) {
-        mealWidgets.add(Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(mealTime,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              ...menuList.map(
-                  (menu) => Text(menu, style: const TextStyle(fontSize: 16))),
-            ],
+      String restaurantName, List<String> mealList, bool isSingle) {
+    return SizedBox(
+        width: isSingle ? MediaQuery.of(context).size.width - 24 : 250,
+        child: Card(
+          margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+          elevation: 0,
+          color: Colors.grey[200],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(restaurantName,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold)),
+                _buildMealRows(mealList),
+              ],
+            ),
           ),
         ));
-      }
-    });
-    return mealWidgets;
+  }
+
+  Widget _buildMealRows(List<String> mealList) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...mealList
+              .map((menu) => Text(menu, style: const TextStyle(fontSize: 14))),
+        ],
+      ),
+    );
   }
 
   void _previousDay() {
