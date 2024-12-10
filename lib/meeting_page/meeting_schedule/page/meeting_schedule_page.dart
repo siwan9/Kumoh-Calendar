@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:kumoh_calendar/meeting_page/add_meeting/page/add_metting_page.dart';
 import 'package:kumoh_calendar/meeting_page/meeting_availability/page/meeting_availability_page.dart';
 
 class MeetingSchedulePage extends StatefulWidget {
-  const MeetingSchedulePage({super.key});
+  const MeetingSchedulePage(
+      {super.key, required this.setTitle, required this.setMenu});
+
+  final Function(Widget) setTitle;
+  final Function(List<Widget>) setMenu;
 
   @override
-  _MeetingSchedulePageState createState() => _MeetingSchedulePageState();
+  State<MeetingSchedulePage> createState() => _MeetingSchedulePageState();
 }
 
 class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  List<DocumentSnapshot> _meetings = [];
+  List<Map<String, dynamic>> _meetingData = []; // 타입 변경
 
   @override
   void initState() {
     super.initState();
     _fetchMeetings();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.setTitle(const Text('그룹일정'));
+      widget.setMenu([]);
+    });
   }
 
   Future<void> _fetchMeetings() async {
@@ -28,11 +38,31 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('meeting_groups')
-        .where('member_list', arrayContains: userId) // 현재 사용자의 UID가 포함된 회의 검색
+        .orderBy('created_at', descending: true) // 최신순으로 정렬
         .get();
 
+    List<Map<String, dynamic>> userMeetings = []; // 로그인된 유저가 참여한 미팅 리스트
+
+    for (var doc in querySnapshot.docs) {
+      // Null 체크 및 타입 변환
+      var data = doc.data() as Map<String, dynamic>?; // 명시적으로 Map<String, dynamic>으로 변환
+
+      if (data != null) {
+        var memberList = data['member_list'] ; // member_list를 안전하게 가져옵니다.
+
+        // memberList가 null이 아닌 경우에만 처리
+        if (memberList != null && memberList.containsKey(userId)) {
+          // 미팅 데이터를 리스트에 추가합니다.
+          userMeetings.add({
+            'id': doc.id, // 문서의 고유 ID
+            ...data, // 문서의 데이터
+          });
+        }
+      }
+    }
+
     setState(() {
-      _meetings = querySnapshot.docs; // 회의 목록 업데이트
+      _meetingData = userMeetings; // 로그인된 유저가 참여한 미팅 리스트
     });
   }
 
@@ -50,14 +80,22 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async{
+          final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddMeetingPage()),
+            MaterialPageRoute(builder: (context) => const AddMeetingPage(meetingData: {})),
           );
+
+          if (result == true) {
+            _fetchMeetings();
+          }
         },
         backgroundColor: Colors.blue, // 버튼 배경색
-        child: const Icon(Icons.add), // 버튼 아이콘
+        shape: const CircleBorder(),
+        child: const Icon(
+          color: Colors.white,
+          Icons.add,
+        ),
       ),
     );
   }
@@ -73,13 +111,18 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
   }
 
   List<Widget> _buildMeetingCards() {
-    return _meetings.map((meeting) {
+    return _meetingData.map((meeting) {
       return GestureDetector(
-        onTap: () {
-          Navigator.push(
+        onTap: () async{
+          final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const MeetingAvailabilityPage()),
+            MaterialPageRoute(builder: (context) => MeetingAvailabilityPage(
+              meetingData: meeting)) // 회의 ID 전달
           );
+
+          if (result == true) {
+            _fetchMeetings();
+          }
         },
         child: Card(
           margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -88,13 +131,18 @@ class _MeetingSchedulePageState extends State<MeetingSchedulePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(meeting['name'] ?? '회의 이름', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(meeting['name'] ?? '회의 이름',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text('장소: ${meeting['location'] ?? '장소 미정'}'),
                 Text('인원: ${meeting['member_list'].length}명'),
                 const SizedBox(height: 8),
                 // 날짜 및 시간 형식은 필요한 대로 수정
-                Text('${meeting['start_date'].toDate()}~${meeting['finish_date'].toDate()}', style: const TextStyle(color: Colors.grey)),
+                Text(
+                  '${DateFormat('yyyy-MM-dd').format(meeting['start_date'].toDate())} ~ ${DateFormat('yyyy-MM-dd').format(meeting['finish_date'].toDate())}',
+                  style: const TextStyle(color: Colors.grey),
+                ),
               ],
             ),
           ),

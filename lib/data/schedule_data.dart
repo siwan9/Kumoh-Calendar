@@ -3,7 +3,7 @@
 
 - id(number)
 - 이름 (string)
-- 유저 id (number)
+- 유저 id (string)
 - 시작 날짜/시간 (timestamp)
 - 종료 날짜/시간 (timestamp, optional)
 - 장소 (string)
@@ -13,13 +13,13 @@
 
 class ScheduleData {
   final int id;
-  final String name;
-  final int userId;
-  final DateTime startDate;
-  final DateTime endDate;
-  final String place;
-  final String memo;
-  final List<int> participants;
+  String name;
+  String userId;
+  DateTime startDate;
+  DateTime endDate;
+  String place;
+  String memo;
+  List<int> participants;
 
   ScheduleData({
     required this.id,
