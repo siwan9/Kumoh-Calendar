@@ -95,18 +95,23 @@ class _RestaurantTabState extends State<RestaurantTab> {
     );
   }
 
-  // 버튼 생성 함수
   Widget _buildCategoryButton(String category) {
     return ElevatedButton(
       onPressed: () {
-        setState(() {
-          selectedCategory = category;
-        });
+        if (selectedCategory != category) {
+          setState(() {
+            selectedCategory = category;
+          });
+        }
       },
       style: ElevatedButton.styleFrom(
-        foregroundColor:
-            selectedCategory == category ? Colors.blue : Colors.grey[300],
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        backgroundColor: selectedCategory == category
+            ? Colors.blue
+            : Colors.grey[300], // 배경색
+        foregroundColor: selectedCategory == category
+            ? Colors.white
+            : Colors.black, // 텍스트 색상
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // 여백
       ),
       child: Text(category, style: const TextStyle(fontSize: 16)),
     );
