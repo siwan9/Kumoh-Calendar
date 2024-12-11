@@ -12,6 +12,7 @@
 */
 
 class ScheduleData {
+  bool editable = true;
   final int id;
   String name;
   String userId;
@@ -22,6 +23,7 @@ class ScheduleData {
   List<int> participants;
 
   ScheduleData({
+    this.editable = true,
     required this.id,
     required this.name,
     required this.userId,
@@ -33,7 +35,9 @@ class ScheduleData {
   });
 
   factory ScheduleData.fromJson(Map<String, dynamic> json) {
+    print(json);
     return ScheduleData(
+      editable: true,
       id: json['id'],
       name: json['name'],
       userId: json['userId'],

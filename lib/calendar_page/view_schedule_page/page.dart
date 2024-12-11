@@ -47,35 +47,39 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
         toolbarHeight: 64,
         leadingWidth: 64,
         actions: [
-          // delete button
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              // delete schedule
-              service.deleteSchedule(schedule.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('일정이 삭제되었습니다.'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
-              Navigator.pop(context);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // edit schedule
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return EditSchedulePage(schedule: schedule);
-                  },
-                ),
-              );
-            },
-          ),
+          ...(schedule.editable
+              ? [
+                  // delete button
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      // delete schedule
+                      service.deleteSchedule(schedule.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('일정이 삭제되었습니다.'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      // edit schedule
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return EditSchedulePage(schedule: schedule);
+                          },
+                        ),
+                      );
+                    },
+                  )
+                ]
+              : []),
           const SizedBox(width: 8),
         ],
       ),
