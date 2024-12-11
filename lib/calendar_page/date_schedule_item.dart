@@ -20,7 +20,7 @@ class ScheduleItemWidget extends StatelessWidget {
         );
       },
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(Colors.blue),
+        backgroundColor: WidgetStateProperty.all(schedule.editable ? Colors.blue : Colors.blueGrey),
         alignment: Alignment.centerLeft,
         minimumSize: WidgetStateProperty.all(const Size(0, 24)),
         padding:

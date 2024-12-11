@@ -9,7 +9,9 @@ class ScheduleService {
   }
 
   Future<List<ScheduleData>> getSchedules() async {
-    return await _repository.fetchSchedules();
+    var schedules = await _repository.fetchSchedules();
+    var academicSchedules = await _repository.fetchAcademicSchedules();
+    return [...academicSchedules, ...schedules];
   }
 
   //get schedule by id

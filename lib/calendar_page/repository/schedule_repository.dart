@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kumoh_calendar/data/schedule_data.dart';
+import 'package:kumoh_calendar/data/school_schedule_data.dart';
 
 class ScheduleRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -28,6 +29,15 @@ class ScheduleRepository {
 
     return querySnapshot.docs
         .map((doc) => ScheduleData.fromJson(doc.data()))
+        .toList();
+  }
+
+  Future<List<ScheduleData>> fetchAcademicSchedules() async {
+    final querySnapshot = await _firestore.collection('school_schedules').get();
+
+    return querySnapshot.docs
+        .map(
+            (doc) => AcademicScheduleData.fromJson(doc.data()).toScheduleData())
         .toList();
   }
 
