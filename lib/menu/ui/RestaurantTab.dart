@@ -86,6 +86,28 @@ class _RestaurantTabState extends State<RestaurantTab> {
     );
   }
 
+  Widget _buildCategoryButton(String category) {
+    return ElevatedButton(
+      onPressed: () {
+        if (selectedCategory != category) {
+          setState(() {
+            selectedCategory = category;
+          });
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: selectedCategory == category
+            ? Colors.blue
+            : Colors.grey[300], // 배경색
+        foregroundColor: selectedCategory == category
+            ? Colors.white
+            : Colors.black, // 텍스트 색상
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // 여백
+      ),
+      child: Text(category, style: const TextStyle(fontSize: 16)),
+    );
+  }
+
   Future<List<Menu>> _getMenusForDay(String date) async {
     return await menuService.getMenus(date);
   }
@@ -207,7 +229,7 @@ class _RestaurantTabState extends State<RestaurantTab> {
             .map((value) => value.length)
             .reduce((value, element) => value > element ? value : element),
         2);
-        print(maxMealCount);
+    print(maxMealCount);
 
     return SizedBox(
         height: 50 + 55 + 22 * maxMealCount.toDouble(),

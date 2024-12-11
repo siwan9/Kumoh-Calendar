@@ -84,24 +84,27 @@ class _NoticePageState extends State<NoticePage> {
   }
 
   Widget _buildTypeButton(String type, String label) {
-    bool isSelected = selectedType == type;
     return ElevatedButton(
-      onPressed: isSelected
-          ? null
-          : () async {
-              setState(() {
-                selectedType = type;
-                notices.clear();
-                generalNotices.clear();
-                generalNoticePage = 0;
-              });
-              await fetchNotices(); // Notice 데이터 다시 로딩
-              await fetchGeneralNotices(); // GeneralNotice 데이터 다시 로딩
-            },
+      onPressed: () async {
+        if (selectedType != type) {
+          setState(() {
+            selectedType = type;
+            notices.clear();
+            generalNotices.clear();
+            generalNoticePage = 0;
+          });
+          await fetchNotices(); // Notice 데이터 다시 로딩
+          await fetchGeneralNotices(); // GeneralNotice 데이터 다시 로딩
+        }
+      },
       style: ElevatedButton.styleFrom(
-        foregroundColor: isSelected ? Colors.blue : Colors.grey[300],
+        backgroundColor:
+            selectedType == type ? Colors.blue : Colors.grey[300], // 배경색
+        foregroundColor:
+            selectedType == type ? Colors.white : Colors.black, // 텍스트 색상
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // 여백
       ),
-      child: Text(label),
+      child: Text(label, style: const TextStyle(fontSize: 16)), // 텍스트 스타일
     );
   }
 
